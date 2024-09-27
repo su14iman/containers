@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  app:
+    container_name: proxy
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+      - ./nginx-snippets:/snippets:ro
+    networks:
+      - local_br
+  authelia:
+    container_name: authelia
+    image: authelia/authelia
+    restart: unless-stopped
+    expose:
+      - 9091
+    volumes:
+      - ./authelia/config:/config
+    environment:
+      TZ: 'Europe/Berlin'
+    networks:
+      - local_br
+
+networks:
+  local_br:
+    name: br0
+    driver: bridge
